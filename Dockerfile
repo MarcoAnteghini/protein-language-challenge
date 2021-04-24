@@ -1,4 +1,4 @@
-python:3.8-slim AS predict
+FROM python:3.8-slim AS predict
 
 WORKDIR /home/biolib/
 
