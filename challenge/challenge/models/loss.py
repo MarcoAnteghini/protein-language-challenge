@@ -4,7 +4,7 @@ import torch.nn as nn
 from challenge.models.metric import get_mask
 
 
-def cross_entropy(outputs: torch.tensor, labels: torch.tensor, mask: torch.tensor) -> torch.tensor:
+def cross_entropy(outputs: torch.tensor, labels: torch.tensor, mask: torch.tensor, weight: torch.tensor) -> torch.tensor:
     """ Returns cross entropy loss using masking
     Args:
         outputs: tensor with predictions
@@ -28,7 +28,8 @@ def q8(outputs: torch.tensor, labels: torch.tensor) -> torch.tensor:
     labels = torch.argmax(labels[:, :, 1:9], dim=2)
     outputs = outputs.permute(0, 2, 1)
 
-    return cross_entropy(outputs, labels, mask)
+    weight = torch.tensor([1.473, 0.484, 2.349, 2.064, 0.686, 1.125, 1.012, 0.607]).float()
+    return cross_entropy(outputs, labels, mask, weight)
 
 
 def q3(outputs: torch.tensor, labels: torch.tensor) -> torch.tensor:
@@ -44,7 +45,8 @@ def q3(outputs: torch.tensor, labels: torch.tensor) -> torch.tensor:
     labels = torch.max(labels[:, :, 1:9] * structure_mask, dim=2)[0].long()
     outputs = outputs.permute(0, 2, 1)
 
-    return cross_entropy(outputs, labels, mask)
+    weight = torch.tensor([0.437, 0.668, 0.378]).float()
+    return cross_entropy(outputs, labels, mask, weight)
 
 
 def secondary_structure_loss(outputs: torch.tensor, labels: torch.tensor) -> torch.tensor:
@@ -54,7 +56,7 @@ def secondary_structure_loss(outputs: torch.tensor, labels: torch.tensor) -> tor
         labels: tensor with labels
     """
     # weighted losses
-    _q8 = q8(outputs[0], labels) * 1
+    _q8 = q8(outputs[0], labels) * 2
     _q3 = q3(outputs[1], labels) * 1
 
     loss = torch.stack([_q8, _q3])
