@@ -28,6 +28,9 @@ class Baseline(ModelBase):
 
         ss8 = self.ss8(x)
         #ss3 = self.ss3(x)
-        ss3 = torch.stack([torch.sum(ss8[:, :, :3], 2), torch.sum(ss8[:, :, 3:5], 2), torch.sum(ss8[:, :, 5:], 2)], dim=2)
+        ss8 = nn.functional.softmax(ss8, 2)
+        ss3 = torch.stack([torch.sum(ss8[:, :, :3], 2),\
+                           torch.sum(ss8[:, :, 3:5], 2),\
+                           torch.sum(ss8[:, :, 5:], 2)], dim=2)
 
         return [ss8, ss3]
