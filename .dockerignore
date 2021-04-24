@@ -1,4 +1,5 @@
 data/*
 saved/*
 
+!saved/netsurf_model/0424-175535/checkpoints/checkpoint-epoch22.pth
 !saved/baseline/0424-210401/checkpoints/model_best.pth
