@@ -55,7 +55,7 @@ def secondary_structure_loss(outputs: torch.tensor, labels: torch.tensor) -> tor
     """
     # weighted losses
     _q8 = q8(outputs[0], labels) * 1
-    _q3 = q3(outputs[1], labels) * 5
+    _q3 = q3(outputs[1], labels) * 1
 
     loss = torch.stack([_q8, _q3])
 

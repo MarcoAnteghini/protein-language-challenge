@@ -82,7 +82,7 @@ def train(cfg: dict, resume: str):
     log.info('Finished!')
 
 
-def eval(cfg: dict, model_path: str):
+def eval(cfg: dict, model_path: str, test_path: str):
     """ Eval using trained model and test file
     Args:
         cfg: configuration of model
@@ -99,6 +99,9 @@ def eval(cfg: dict, model_path: str):
 
     # remove train data from configuration
     cfg['data_loader']['args']['train_path'] = None
+
+    if test_path:
+        cfg['data_loader']['args']['test_path'] = [test_path]
 
     transforms = get_instance(module_aug, 'augmentation', cfg)
     data_loader = get_instance(module_data, 'data_loader', cfg)
@@ -124,29 +127,35 @@ def predict(cfg: dict, model_path: str, data: str):
         model_path: path to trained model
         data: file path to data
     """
-    model = get_instance(module_arch, 'arch', cfg)
-    dataset_loader = getattr(module_dataset, cfg['data_loader']['args']['dataset_loader'])
-    data = dataset_loader(data)
+    with torch.no_grad():
+        seed_everything(cfg['seed'])
+        
+        # instantiate and load the model
+        model = get_instance(module_arch, 'arch', cfg)
+        model_data = torch.load(model_path, map_location ='cpu')
+        model.load_state_dict(model_data['state_dict'])
 
-    result = model.forward(data.X, data.y[:, :, 0])
+        model.eval()
 
-    # create predictions.csv
-    Q8, Q3 = "GHIBESTC", "HEC"
+        dataset_loader = getattr(module_dataset, cfg['data_loader']['args']['dataset_loader'])
+        data = dataset_loader(data)
 
-    q8 = np.array([Q8[val] for val in np.argmax(result[0].detach().numpy(), axis=2).flatten()])
-    q3 = np.array([Q3[val] for val in np.argmax(result[1].detach().numpy(), axis=2).flatten()])
+        result = model(data.X, data.y[:, :, 0])
 
-    mask = data.y[:, :, 0].detach().numpy().flatten().astype(int)
+        mask = data.y[:, :, 0]
 
-    q8 = q8[mask == 1]
-    q3 = q3[mask == 1]
+        # create predictions.csv
+        Q8, Q3 = "GHIBESTC", "HEC"
 
-    df = np.concatenate([np.expand_dims(q8, axis=1), np.expand_dims(q3, axis=1)], axis=1)
+        q8 = np.array([Q8[val] for val in torch.argmax(result[0], dim=2)[mask == 1].flatten()])
+        q3 = np.array([Q3[val] for val in torch.argmax(result[1], dim=2)[mask == 1].flatten()])
 
-    # save to file
-    df = pd.DataFrame(df)
-    df = df.set_axis(["q8", "q3"], axis=1, inplace=False)
-    df.to_csv('predictions.csv')
+        df = np.concatenate([np.expand_dims(q8, axis=1), np.expand_dims(q3, axis=1)], axis=1)
+
+        # save to file
+        df = pd.DataFrame(df)
+        df = df.set_axis(["q8", "q3"], axis=1, inplace=False)
+        df.to_csv('predictions.csv')
 
     return print(df)
 
