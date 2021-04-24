@@ -1,4 +1,4 @@
 data/*
 saved/*
 
-!saved/mlp/0424-202330/checkpoints/model_best.pth
+!saved/baseline/0424-210401/checkpoints/model_best.pth
