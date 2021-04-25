@@ -9,8 +9,12 @@
 
 
 ### Project Description
-Work in progress - check back soon.
-[When you get towards the end of the hackathon, a more detailed project description should go here.]
+How good can a DL embedding perform in predicting the protein secondary structure?. That is what we analysed participating in the "From protein language to features without alignments" challenge. 
+Our team focused on solutions to improve the prediction:
+i) modify the weights in the cross-entropy function according to the specific secondary structure frequency in the used training set 
+ii) mapping the prediction of the S8 classes to the S3 classes and not perform two separate classifications (thus fastening and improving the process)
+iii) re-implement the NetSurfP-2.0 model 
+iv) implement a less complex but similar version of NetSurfP-2.0 based on CNN. 
 
 
 ### Team Members
