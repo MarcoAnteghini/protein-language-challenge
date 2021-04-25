@@ -8,10 +8,10 @@ RUN pip install -r challenge/requirements.txt
 
 # Example: COPY saved/baseline/0422-213641/checkpoints/model_best.pth model.pth
 # Remember to add it to dockerignore too
-COPY saved/mlp/0425-035542/checkpoints/model_best.pth model.pth
+COPY saved/cnn1d/0425-032915/checkpoints/model_best.pth model.pth
 
 # move final configuration
-COPY experiments/config_mlp.yml config.yml
+COPY experiments/config_cnn1d.yml config.yml
 
 # copy challenge project
 COPY challenge challenge

@@ -1,4 +1,4 @@
 data/*
 saved/*
 
-!saved/mlp/0425-035542/checkpoints/model_best.pth
+!saved/cnn1d/0425-032915/checkpoints/model_best.pth
